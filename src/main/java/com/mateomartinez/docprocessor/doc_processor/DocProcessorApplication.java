@@ -1,0 +1,13 @@
+package com.mateomartinez.docprocessor.doc_processor;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DocProcessorApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DocProcessorApplication.class, args);
+	}
+
+}
