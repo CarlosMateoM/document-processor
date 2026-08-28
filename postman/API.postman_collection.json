@@ -46,22 +46,19 @@
           "request": {
             "method": "POST",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"filename\": \"document-1.pdf\",\r\n    \"size\": 429\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}documents?size=1234&filename=archivo.pdf",
+              "raw": "{{baseUrl}}documents",
               "host": [
                 "{{baseUrl}}documents"
-              ],
-              "query": [
-                {
-                  "key": "size",
-                  "value": "1234",
-                  "type": "text"
-                },
-                {
-                  "key": "filename",
-                  "value": "archivo.pdf",
-                  "type": "text"
-                }
               ]
             }
           },
