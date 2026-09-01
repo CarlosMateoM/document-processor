@@ -1,0 +1,7 @@
+package com.mateomartinez.docprocessor.doc_processor.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(Long id) {
+        super("Resource with ID " + id + " not found.");
+    }
+}

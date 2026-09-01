@@ -1,17 +1,9 @@
 package com.mateomartinez.docprocessor.doc_processor.response;
 
-public class ErrorResponse {
-    private String message;
+import java.time.LocalDateTime;
 
-    public ErrorResponse(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+public record ErrorResponse (
+    String message
+) {
+     
 }
