@@ -1,57 +1,59 @@
 package com.mateomartinez.docprocessor.doc_processor.exception;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-
-import com.mateomartinez.docprocessor.doc_processor.response.ErrorResponse;
-import com.mateomartinez.docprocessor.doc_processor.response.ValidationResponse;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-    
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
-        ResourceNotFoundException exception,
-        WebRequest request
-    ) {
+    public ResponseEntity<ProblemDetail> handleResourceNotFoundException(
+            ResourceNotFoundException exception,
+            WebRequest request) {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            exception.getMessage()
-        );
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage());
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(problemDetail, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationResponse> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException exception,
-        WebRequest request
-    ) {
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException exception,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
 
         Map<String, String> errors = new HashMap<>();
 
         exception.getBindingResult()
-            .getFieldErrors()
-            .forEach(error -> 
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
+                .getFieldErrors()
+                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        ValidationResponse validationResponse = new ValidationResponse(
-            "validation failed",
-            errors
-        );
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNPROCESSABLE_CONTENT,
+                "Validation failed");
 
+        problemDetail.setProperty("errors", errors);
 
-        return new ResponseEntity<>(validationResponse, HttpStatus.UNPROCESSABLE_CONTENT);
+        return handleExceptionInternal(
+                exception,
+                problemDetail,
+                headers,
+                HttpStatus.UNPROCESSABLE_CONTENT,
+                request);
     }
-
 
 }
