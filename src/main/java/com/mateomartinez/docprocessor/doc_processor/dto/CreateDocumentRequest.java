@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record CreateDocumentRequest(
-    @NotNull(message = "size is requiered")
+    @NotNull(message = "size is required.")
     @Positive(message = "size must be greater than zero")
     Long size, 
     
-    @NotBlank(message = "Filename is requiered")
+    @NotBlank(message = "Filename is required.")
     String filename
 ) {}
