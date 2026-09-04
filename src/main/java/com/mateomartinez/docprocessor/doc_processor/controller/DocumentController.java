@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,14 +30,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/documents")
 public class DocumentController {
 
-    /*
-     * TODO:
-     * - validaciones del request [X]
-     * - formateo de respuestas []
-     * - repositorio [X]
-     * - guardar archivos []
-     */
-
     private final DocumentRepository documentRepository;
 
     public DocumentController(DocumentRepository documentRepository) {
@@ -42,7 +38,8 @@ public class DocumentController {
 
     @PostMapping
     public ResponseEntity<DocumentResponse> create(
-            @Valid @RequestBody CreateDocumentRequest request) {
+            @Valid @RequestBody CreateDocumentRequest request
+    ) {
         Document document = new Document();
 
         document.setFilename(request.filename());
@@ -57,7 +54,8 @@ public class DocumentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponse> getById(
-            @PathVariable Long id) {
+            @PathVariable Long id
+    ) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
@@ -67,21 +65,22 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DocumentResponse>> getAll() {
-        List<Document> documents = documentRepository.findAll();
+    public ResponseEntity<Page<DocumentResponse>> getAll(
+        @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<Document> documents = documentRepository.findAll(pageable);
 
-        List<DocumentResponse> documentResponse = documents
-            .stream()
-            .map(DocumentResponse::from)
-            .toList();
+        Page<DocumentResponse> response = documents.map(DocumentResponse::from);
 
-        return ResponseEntity.ok(documentResponse);
+        return ResponseEntity.ok(response);
     }
 
+ 
     @PutMapping("/{id}")
     public void update(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateDocumentRequest request) {
+            @Valid @RequestBody UpdateDocumentRequest request
+    ) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
